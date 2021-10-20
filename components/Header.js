@@ -1,19 +1,37 @@
 import Button from "@material-tailwind/react/Button";
 import Icon from "@material-tailwind/react/Icon";
+import { useSession, signOut, signIn } from "next-auth/react";
 
 function Header() {
+    const { data: session } = useSession();
+
     return (<header className="sticky top-0 z-50 flex items-center px-4 py-2 shadow-md bg-white">
         <Button color="gray" buttonType="outline" rounded={true} iconOnly={true} ripple="dark" className="h-20 w-20 border-0"><Icon name="menu" size="3xl" /></Button>
         <Icon name="description" size="5xl" color="orange" />
-        <h1 className="ml-2 text-gray-700 text-2xl">Docs</h1>
+        <h1 className="ml-2 text-gray-700 text-2xl">Archive</h1>
         
-        <div className="mx-5 md:mx-20 flex flex-grow items-center px-5 py-2 bg-gray-100 text-gray-600 rounded-lg focus-within:text-gray-600 focus-within:shadow-md">
-            <Icon name="search" size="3xl" color="gray" />
-            <input type="text" placeholder="Search" className="flex-grow px-5 text-base bg-transparent outline-none" />
-        </div>
+        {session ? (
+            <>
+            <div className="mx-5 md:mx-20 flex flex-grow items-center px-5 py-2 bg-gray-100 text-gray-600 rounded-lg focus-within:text-gray-600 focus-within:shadow-md">
+                <Icon name="search" size="3xl" color="gray" />
+                <input type="text" placeholder="Search" className="flex-grow px-5 text-base bg-transparent outline-none" />
+            </div>
 
-        <Button color="gray" buttonType="outline" rounded={true} iconOnly={true} ripple="dark" className="ml-5 md:ml-20 h-20 w-20 border-0"><Icon name="apps" size="3xl" color="gray" /></Button>
-        <img loading="lazy" className="cursor-pointer h-12 w-12 rounded-full ml-2" src='https://media-exp1.licdn.com/dms/image/C560BAQH8hBs8y3SZKQ/company-logo_200_200/0/1633595188051?e=1642032000&v=beta&t=HKMiyNr70PKcIbmX32yBgp2qlLPHYhevlEMkHPCnNl0' alt="" />
+            <Button color="gray" buttonType="outline" rounded={true} iconOnly={true} ripple="dark" className="ml-5 md:ml-20 h-20 w-20 border-0"><Icon name="apps" size="3xl" color="gray" /></Button>
+            <img loading="lazy" onClick={ signOut } className="cursor-pointer h-12 w-12 rounded-full ml-2" src={session?.user?.image} alt="" />
+            </>
+
+        ) : (
+            <>
+            <div className="mx-5 md:mx-20 flex flex-grow items-center px-5 py-2 bg-gray-100 text-gray-600 rounded-lg focus-within:text-gray-600 focus-within:shadow-md">
+                <Icon name="search" size="3xl" color="gray" />
+                <input type="text" placeholder="Search" className="flex-grow px-5 text-base bg-transparent outline-none" />
+            </div>
+
+            <Button onClick={ signIn } buttonType="outline" color="orange" rounded={true} iconOnly={true} ripple="dark" className="ml-5 md:ml-20 h-20 w-20 border-0"> Sign In </Button>
+            </>
+        )}
+        
         
     </header>
     );

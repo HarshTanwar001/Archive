@@ -6,10 +6,10 @@ import Image from "next/image";
 import Modal from "@material-tailwind/react/Modal";
 import ModalBody from "@material-tailwind/react/ModalBody";
 import ModalFooter from "@material-tailwind/react/ModalFooter";
+import { useSession, signOut } from "next-auth/react";
 import { useState } from "react";
 
 export default function Home() {
-
   const [showModal, setShowModal] = useState(false);
   const [input, setInput] = useState("");
 
@@ -26,7 +26,7 @@ export default function Home() {
     
     <ModalFooter>
       <Button color="orange" buttonType="link" onClick={(e) => setShowModal(false)} ripple="dark">Cancel</Button>
-      <Button color="orange" onClick={createDocument} ripple="light">Create</Button>
+      <Button color="orange" onClick={ createDocument } ripple="light">Create</Button>
     </ModalFooter>
 
   </Modal>
