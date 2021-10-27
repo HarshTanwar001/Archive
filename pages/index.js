@@ -7,7 +7,7 @@ import Image from "next/image";
 import Modal from "@material-tailwind/react/Modal";
 import ModalBody from "@material-tailwind/react/ModalBody";
 import ModalFooter from "@material-tailwind/react/ModalFooter";
-import { addDoc, collection, onSnapshot, serverTimestamp } from "@firebase/firestore";
+import { addDoc, collection, orderBy, onSnapshot, serverTimestamp } from "@firebase/firestore";
 import { db } from "../firebase";
 import { getSession, useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
@@ -21,18 +21,16 @@ export default function Home() {
   useEffect( 
     () => 
       { if (session) {
-        onSnapshot(collection(db, "userDocs/", `${ session.user.email }`, "/docs"), (snapshot) =>
-        setSnap(snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id })))
+        onSnapshot(collection(db, "userDocs/", `${ session.user.email }`, "/docs"), orderBy("timestamp"), (snapshot) =>
+          setSnap(snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id })))
         )
       }
-    },
-    [ session ]
-  );
+    }, [ session ]);
 
   const createDocument = () => {
     if (!input || !session) return;
 
-    const docRef = addDoc(collection(db, "userDocs", `${ session.user.email }`, "docs"), {fileName: input, timestamp: serverTimestamp()});
+    addDoc(collection(db, "userDocs", `${ session.user.email }`, "docs"), {fileName: input, timestamp: serverTimestamp()});
 
     setInput("");
     setShowModal(false);
@@ -41,7 +39,16 @@ export default function Home() {
   const modal = (
   <Modal size="sm" active={ showModal } toggler={() => setShowModal(false)}>
     
-    <ModalBody><input value={ input } onChange={(e) => setInput(e.target.value)} type="text" className="outline-none w-full" placeholder="Enter name of the document" onKeyDown={(e) => e.key === "Enter" && createDocument()} /></ModalBody>
+    <ModalBody>
+      <input 
+        value={ input } 
+        onChange={(e) => setInput(e.target.value)} 
+        type="text" 
+        className="outline-none w-full" 
+        placeholder="Enter name of the document" 
+        onKeyDown={(e) => e.key === "Enter" && createDocument()} 
+      />
+    </ModalBody>
     
     <ModalFooter>
       <Button color="orange" buttonType="link" onClick={(e) => setShowModal(false)} ripple="dark">Cancel</Button>
