@@ -34,14 +34,6 @@ function Doc() {
 
                 <div className="flex-grow px-2">
                     <h2>{ snapshot.fileName }</h2>
-                    <div className="flex items-center text-sm space-x-1 -ml-1 h-8 text-gray-600">
-                        <p className="option">File</p>
-                        <p className="option">Edit</p>
-                        <p className="option">View</p>
-                        <p className="option">Insert</p>
-                        <p className="option">Format</p>
-                        <p className="option">Tools</p>
-                    </div>
                 </div>
 
                 <Button 
@@ -49,16 +41,17 @@ function Doc() {
                     buttonType="filled" 
                     size="regular" 
                     className="hidden md:inline-flex h-10" 
-                    rounded={false} 
-                    block={false} 
-                    iconOnly={false} 
+                    rounded={ false } 
+                    block={ false } 
+                    iconOnly={ false } 
                     ripple="light">
                     <Icon name="people" size="md"/> SHARE
                 </Button>
 
-                <img 
+                <img
+                    loading="lazy" 
                     className="cursor-pointer rounded-full h-10 w-10 ml-2" 
-                    src={session?.user?.image} 
+                    src={ session?.user?.image } 
                     alt="" 
                 />
 

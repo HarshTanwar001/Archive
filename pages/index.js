@@ -19,11 +19,11 @@ export default function Home() {
   const [snap, setSnap] = useState([{ fileName: "Loading...", id: "initial" }]);
 
   async function updateDoc(session) {
-    const q = query(collection(db, "userDocs/", `${ session.user.email }`, "/docs"), where("required", "==", false));
+    const q = query(collection(db, "userDocs/", `${ session.user.email }`, "/docs"), where("required", "!=", null), where("required", "==", false));
     const snapshot = await getDocs(q);
 
     if (!snapshot.empty) {
-      const results = snapshot.docs.map((doc) => ({id: doc.id}))
+      const results = snapshot.docs.map((doc) => ({ id: doc.id }))
 
       results.forEach((result) => {
         const docRef = doc(db, "userDocs/", `${ session.user.email }`, "/docs/", result.id);
@@ -42,33 +42,39 @@ export default function Home() {
           setSnap(snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id })))
         );
       }
-    }, [ session ]);
+    }, [ session ]
+  );
 
   const createDocument = () => {
     if (!input || !session) return;
 
-    addDoc(collection(db, "userDocs", `${ session.user.email }`, "docs"), {fileName: input, timestamp: serverTimestamp(), required: true,});
+    addDoc(collection(db, "userDocs", `${ session.user.email }`, "docs"), {
+      editorState: "",
+      fileName: input, 
+      timestamp: serverTimestamp(), 
+      required: true,}
+    );
 
     setInput("");
     setShowModal(false);
   };
 
   const modal = (
-  <Modal size="sm" active={ showModal } toggler={() => setShowModal(false)}>
+  <Modal size="sm" active={ showModal } toggler={ () => setShowModal(false) }>
     
     <ModalBody>
       <input 
         value={ input } 
-        onChange={(e) => setInput(e.target.value)} 
+        onChange={ (e) => setInput(e.target.value) } 
         type="text" 
         className="outline-none w-full" 
         placeholder="Enter name of the document" 
-        onKeyDown={(e) => e.key === "Enter" && createDocument()} 
+        onKeyDown={ (e) => e.key === "Enter" && createDocument() } 
       />
     </ModalBody>
     
     <ModalFooter>
-      <Button color="orange" buttonType="link" onClick={(e) => setShowModal(false)} ripple="dark">Cancel</Button>
+      <Button color="orange" buttonType="link" onClick={ (e) => setShowModal(false) } ripple="dark">Cancel</Button>
       <Button color="orange" onClick={ createDocument } ripple="light">Create</Button>
     </ModalFooter>
 
@@ -92,11 +98,17 @@ export default function Home() {
 
           <div className="flex items-center justify-between py-6">
             <h2 className="text-gray-700 text-lg">Create a new document</h2>
-            <Button color="gray" buttonType="outline" iconOnly={true} ripple="dark" className="border-0"><Icon name="more_vert" size="3xl" /></Button>
+            <Button 
+              color="gray" 
+              buttonType="outline" 
+              iconOnly={ true } 
+              ripple="dark" 
+              className="border-0"><Icon name="more_vert" size="3xl" />
+            </Button>
           </div>
 
           <div>
-            <div onClick={() => setShowModal(true)} className="relative h-52 w-40 border-2 cursor-pointer hover:border-orange-700">
+            <div onClick={ () => setShowModal(true) } className="relative h-52 w-40 border-2 cursor-pointer hover:border-orange-700">
             <Image loading="lazy" src="https://us.123rf.com/450wm/kongvector/kongvector1810/kongvector181008581/110250917-finger-plus-sign-isolated-on-the-mascot-vector-illustration.jpg?ver=6" layout="fill" />
             </div>
             <p className="ml-2 mt-2 font-semibold text-sm text-gray-700"></p>
@@ -115,8 +127,14 @@ export default function Home() {
           </div>
 
           {session ? snap.map((doc) => (
-            <DocumentRow key={ doc.id } id={ doc.id } fileName={ doc.fileName } date={ doc.timestamp } />
-          )) : <></>
+            <DocumentRow 
+              key={ doc.id } 
+              id={ doc.id }
+              email={ session.user.email } 
+              fileName={ doc.fileName } 
+              date={ doc.timestamp } 
+            />
+            )) : <></>
           }
 
         </div>
