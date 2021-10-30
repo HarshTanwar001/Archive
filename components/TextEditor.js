@@ -18,8 +18,17 @@ function TextEditor() {
 
     useEffect(() => {
         if (session) {
+            if (performance.getEntriesByType("navigation").map((nav) => nav.type).includes('reload')){
+                const docRef = doc(db, "userDocs/", `${ session.user.email }`, "/docs/", `${ id }`);
+                const payload = { 
+                    required: true 
+                };
+        
+                setDoc(docRef, payload, { merge: true });
+            }
+
             onSnapshot(doc(db, "userDocs/", `${ session.user.email }`, "/docs/", `${ id }`), (doc) => {
-                if (doc.data().editorState){
+                if (doc.data().required && doc.data().editorState){
                     setEditorState(
                         EditorState.createWithContent(
                             convertFromRaw(doc.data().editorState)
@@ -34,7 +43,10 @@ function TextEditor() {
         setEditorState(editorState);
 
         const docRef = doc(db, "userDocs/", `${ session.user.email }`, "/docs/", `${ id }`);
-        const payload = { editorState: convertToRaw(editorState.getCurrentContent()) };
+        const payload = { 
+            editorState: convertToRaw(editorState.getCurrentContent()), 
+            required: false 
+        };
 
         setDoc(docRef, payload, { merge: true });
     };

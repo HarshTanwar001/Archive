@@ -7,7 +7,7 @@ import Image from "next/image";
 import Modal from "@material-tailwind/react/Modal";
 import ModalBody from "@material-tailwind/react/ModalBody";
 import ModalFooter from "@material-tailwind/react/ModalFooter";
-import { addDoc, collection, orderBy, onSnapshot, serverTimestamp } from "@firebase/firestore";
+import { addDoc, collection, doc, orderBy, onSnapshot, serverTimestamp, query, where, setDoc, getDocs } from "@firebase/firestore";
 import { db } from "../firebase";
 import { getSession, useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
@@ -18,19 +18,36 @@ export default function Home() {
   const [input, setInput] = useState("");
   const [snap, setSnap] = useState([{ fileName: "Loading...", id: "initial" }]);
 
+  async function updateDoc(session) {
+    const q = query(collection(db, "userDocs/", `${ session.user.email }`, "/docs"), where("required", "==", false));
+    const snapshot = await getDocs(q);
+
+    if (!snapshot.empty) {
+      const results = snapshot.docs.map((doc) => ({id: doc.id}))
+
+      results.forEach((result) => {
+        const docRef = doc(db, "userDocs/", `${ session.user.email }`, "/docs/", result.id);
+        setDoc(docRef, { required: true }, { merge: true });
+      });
+    }
+  }
+
   useEffect( 
     () => 
       { if (session) {
-        onSnapshot(collection(db, "userDocs/", `${ session.user.email }`, "/docs"), orderBy("timestamp"), (snapshot) =>
+        updateDoc(session);
+
+        const q = query(collection(db, "userDocs/", `${ session.user.email }`, "/docs"), orderBy("timestamp", "desc"));
+        onSnapshot(q, (snapshot) =>
           setSnap(snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id })))
-        )
+        );
       }
     }, [ session ]);
 
   const createDocument = () => {
     if (!input || !session) return;
 
-    addDoc(collection(db, "userDocs", `${ session.user.email }`, "docs"), {fileName: input, timestamp: serverTimestamp()});
+    addDoc(collection(db, "userDocs", `${ session.user.email }`, "docs"), {fileName: input, timestamp: serverTimestamp(), required: true,});
 
     setInput("");
     setShowModal(false);
