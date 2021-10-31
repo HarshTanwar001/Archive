@@ -102,9 +102,6 @@ function DocumentRow({ id, fileName, date, email }){
                 <DropdownItem onClick={ () => setDelModal(true) } color="orange" ripple="light">
                     Delete
                 </DropdownItem>
-                <DropdownItem color="orange" ripple="light">
-                    Export
-                </DropdownItem>
                 <DropdownItem onClick={ () => setRe_Modal(true) } color="orange" ripple="light">
                     Rename
                 </DropdownItem>

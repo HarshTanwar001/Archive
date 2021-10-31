@@ -28,13 +28,16 @@ function TextEditor() {
             }
 
             onSnapshot(doc(db, "userDocs/", `${ session.user.email }`, "/docs/", `${ id }`), (doc) => {
-                if (doc.data().required && doc.data().editorState){
-                    setEditorState(
-                        EditorState.createWithContent(
-                            convertFromRaw(doc.data().editorState)
-                        )
-                    );
+                try {
+                    if (doc.data().required && doc.data().editorState){
+                        setEditorState(
+                            EditorState.createWithContent(
+                                convertFromRaw(doc.data().editorState)
+                            )
+                        );
+                    }
                 }
+                catch (error){}
             });
         }
     }, [ session ]);
