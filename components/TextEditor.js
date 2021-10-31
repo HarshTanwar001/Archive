@@ -52,7 +52,7 @@ function TextEditor() {
     };
 
     return (
-        <div className="bg-[#F8F9FA] min-h-screen pb-16">
+        <div className="bg-[#F8F9FA] h-screen pb-64">
             <Editor
                 editorState={ editorState } 
                 onEditorStateChange={ onEditorStateChange }

@@ -5,13 +5,20 @@ import { db } from "../../firebase";
 import { doc, getDoc } from "@firebase/firestore";
 import { getSession, useSession } from "next-auth/react";
 import { useState } from "react";
+import { useReactToPrint } from 'react-to-print';
+import { useRef } from 'react';
 import { useRouter } from "next/dist/client/router"
 
 function Doc() {
+    const componentRef = useRef();
     const { data: session } = useSession();
     const router = useRouter();
     const { id } = router.query;
     const [snapshot, setSnapshot] = useState([]);
+
+    const handlePrint = useReactToPrint({
+        content: () => componentRef.current,
+    });
 
     if (session) {
         (async function getDocuments() {
@@ -38,6 +45,7 @@ function Doc() {
 
                 <Button 
                     color="orange" 
+                    onClick={ handlePrint }
                     buttonType="filled" 
                     size="regular" 
                     className="hidden md:inline-flex h-10" 
@@ -45,7 +53,7 @@ function Doc() {
                     block={ false } 
                     iconOnly={ false } 
                     ripple="light">
-                    <Icon name="people" size="md"/> SHARE
+                    <Icon name="people" size="md"/> EXPORT/ PRINT
                 </Button>
 
                 <img
@@ -57,7 +65,9 @@ function Doc() {
 
             </header>
 
-            <TextEditor />
+            <div ref={ componentRef }>
+                <TextEditor />
+            </div>
 
         </div>
     );
