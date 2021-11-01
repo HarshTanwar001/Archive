@@ -1,6 +1,5 @@
 import Button from "@material-tailwind/react/Button";
-import Dropdown from "@material-tailwind/react/Dropdown"
-import DropdownItem from "@material-tailwind/react/DropdownItem"
+import Dropdown from "react-bootstrap/Dropdown";
 import Icon from "@material-tailwind/react/Icon";
 import Modal from "@material-tailwind/react/Modal";
 import ModalBody from "@material-tailwind/react/ModalBody";
@@ -9,12 +8,28 @@ import { addDoc, collection, deleteDoc, doc, getDoc } from "@firebase/firestore"
 import { db } from "../firebase";
 import { useRouter } from "next/dist/client/router"
 import { useState } from "react";
+import { makeStyles } from '@mui/styles';
+
+const styles = makeStyles ({
+  select: {
+    backgroundColor: 'orange',
+    borderRadius: '15px',
+  }, 
+  
+  item: {
+    '&:focus': {
+      backgroundColor: 'orange',
+    },
+  },
+
+});
 
 function DocumentRow({ id, fileName, date, email }){
     const [delModal, setDelModal] = useState(false);
     const [input, setInput] = useState("");
     const [re_Modal, setRe_Modal] = useState(false);
     const router = useRouter();
+    const usestyles = styles();
 
     const deleteDocument = async() => { 
         await deleteDoc(doc(db, "userDocs/", `${ email }`, "/docs/", `${ id }`));
@@ -72,7 +87,7 @@ function DocumentRow({ id, fileName, date, email }){
           </ModalBody>
           
           <ModalFooter>
-            <Button color="orange" buttonType="link" onClick={ (e) => setRe_Modal(false) } ripple="dark">Cancel</Button>
+            <Button color="orange" buttonType="link" onClick={ () => setRe_Modal(false) } ripple="dark">Cancel</Button>
             <Button color="orange" onClick={ renameDocument } ripple="light">Rename</Button>
           </ModalFooter>
       
@@ -89,24 +104,13 @@ function DocumentRow({ id, fileName, date, email }){
             <p onClick={ () => router.push(`/doc/${id}`) } className="flex-grow pl-5 w-10 pr-10 truncate">{ fileName }</p>
             <p onClick={ () => router.push(`/doc/${id}`) } className="pr-5 text-sm">{ date?.toDate().toLocaleDateString() }</p>
 
-            <Dropdown
-                color="orange"
-                placement="bottom-start"
-                buttonText=""
-                buttonType="filled"
-                size="sm"
-                rounded={ true }
-                block={ false }
-                ripple="light">
-
-                <DropdownItem onClick={ () => setDelModal(true) } color="orange" ripple="light">
-                    Delete
-                </DropdownItem>
-                <DropdownItem onClick={ () => setRe_Modal(true) } color="orange" ripple="light">
-                    Rename
-                </DropdownItem>
-
-            </Dropdown>
+          <Dropdown>
+            <Dropdown.Toggle className={ usestyles.select } variant="" id="dropdown-basic" size="sm"></Dropdown.Toggle>
+            <Dropdown.Menu>
+              <Dropdown.Item className={ usestyles.item } href="#" onClick={ () => setDelModal(true) }>Delete</Dropdown.Item>
+              <Dropdown.Item className={ usestyles.item } href="#" onClick={ () => setRe_Modal(true) }>Rename</Dropdown.Item>
+            </Dropdown.Menu>
+          </Dropdown>
         </div>
     );
 }

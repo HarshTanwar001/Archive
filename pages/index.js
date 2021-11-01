@@ -1,7 +1,6 @@
 import Button from "@material-tailwind/react/Button";
 import DocumentRow from "../components/DocumentRow";
 import Head from 'next/head';
-import Header from '../components/Header';
 import Icon from "@material-tailwind/react/Icon";
 import Image from "next/image";
 import Modal from "@material-tailwind/react/Modal";
@@ -9,7 +8,7 @@ import ModalBody from "@material-tailwind/react/ModalBody";
 import ModalFooter from "@material-tailwind/react/ModalFooter";
 import { addDoc, collection, doc, orderBy, onSnapshot, serverTimestamp, query, where, setDoc, getDocs } from "@firebase/firestore";
 import { db } from "../firebase";
-import { getSession, useSession } from "next-auth/react";
+import { getSession, useSession, signOut, signIn } from "next-auth/react";
 import { useEffect, useState } from "react";
 
 export default function Home() {
@@ -17,6 +16,7 @@ export default function Home() {
   const [showModal, setShowModal] = useState(false);
   const [input, setInput] = useState("");
   const [snap, setSnap] = useState([{ fileName: "Loading...", id: "initial" }]);
+  const [searchTerm, setSearchTerm] = useState("");
 
   async function updateDoc(session) {
     const q = query(collection(db, "userDocs/", `${ session.user.email }`, "/docs"), where("required", "!=", null), where("required", "==", false));
@@ -89,7 +89,35 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <Header />
+      <header className="sticky top-0 z-50 flex items-center px-4 py-2 shadow-md bg-white">
+        <Button color="gray" buttonType="outline" rounded={true} iconOnly={true} ripple="dark" className="h-20 w-20 border-0"><Icon name="menu" size="3xl" /></Button>
+        <Icon name="description" size="5xl" color="orange" />
+        <h1 className="ml-2 text-gray-700 text-2xl">Archive</h1>
+        
+        {session ? (
+            <>
+            <div className="mx-5 md:mx-20 flex flex-grow items-center px-5 py-2 bg-gray-100 text-gray-600 rounded-lg focus-within:text-gray-600 focus-within:shadow-md">
+                <Icon name="search" size="3xl" color="gray" />
+                <input type="text" placeholder="Search" className="flex-grow px-5 text-base bg-transparent outline-none" onChange={ (e) => { setSearchTerm(e.target.value); } } />
+            </div>
+
+            <Button color="gray" buttonType="outline" rounded={true} iconOnly={true} ripple="dark" className="ml-5 md:ml-20 h-20 w-20 border-0"><Icon name="apps" size="3xl" color="gray" /></Button>
+            <img loading="lazy" onClick={ signOut } className="cursor-pointer h-12 w-12 rounded-full ml-2" src={session?.user?.image} alt="" />
+            </>
+
+        ) : (
+            <>
+            <div className="mx-5 md:mx-20 flex flex-grow items-center px-5 py-2 bg-gray-100 text-gray-600 rounded-lg focus-within:text-gray-600 focus-within:shadow-md">
+                <Icon name="search" size="3xl" color="gray" />
+                <input type="text" placeholder="Search" className="flex-grow px-5 text-base bg-transparent outline-none" />
+            </div>
+
+            <Button onClick={ signIn } buttonType="outline" color="orange" rounded={true} iconOnly={true} ripple="dark" className="ml-5 md:ml-20 h-20 w-20 border-0"> Sign In </Button>
+            </>
+        )}
+        
+        
+    </header>
 
       { modal }
 
@@ -126,7 +154,15 @@ export default function Home() {
             <Icon name="folder" size="3xl" color="gray" />
           </div>
 
-          {session ? snap.map((doc) => (
+          {session ? snap.filter((val) => 
+            {
+              if (searchTerm == ""){
+                return val;
+              }
+              else if (val.fileName.toLowerCase().includes(searchTerm.toLowerCase())) {
+                return val;
+              }
+            }).map((doc) => (
             <DocumentRow 
               key={ doc.id } 
               id={ doc.id }
