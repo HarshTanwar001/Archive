@@ -2,11 +2,12 @@ import Button from "@material-tailwind/react/Button";
 import DocumentRow from "../components/DocumentRow";
 import Head from 'next/head';
 import Icon from "@material-tailwind/react/Icon";
+import InfiniteScroll from 'react-infinite-scroll-component';
 import Image from "next/image";
 import Modal from "@material-tailwind/react/Modal";
 import ModalBody from "@material-tailwind/react/ModalBody";
 import ModalFooter from "@material-tailwind/react/ModalFooter";
-import { addDoc, collection, doc, orderBy, onSnapshot, serverTimestamp, query, where, setDoc, getDocs } from "@firebase/firestore";
+import { addDoc, collection, doc, orderBy, onSnapshot, serverTimestamp, query, where, setDoc, getDocs, limit, startAfter } from "@firebase/firestore";
 import { db } from "../firebase";
 import { getSession, useSession, signOut, signIn } from "next-auth/react";
 import { useEffect, useState } from "react";
@@ -15,8 +16,18 @@ export default function Home() {
   const { data: session } = useSession();
   const [showModal, setShowModal] = useState(false);
   const [input, setInput] = useState("");
+  const [lastDoc, setLastDoc] = useState(null);
   const [snap, setSnap] = useState([{ fileName: "Loading...", id: "initial" }]);
   const [searchTerm, setSearchTerm] = useState("");
+
+  const getMoreDocs = async() => {
+    const q = query(collection(db, "userDocs/", `${ session.user.email }`, "/docs"), orderBy("timestamp", "desc"), startAfter(lastDoc), limit(3));
+
+    onSnapshot(q, (snapshot) => { 
+      setLastDoc(snapshot.docs[snapshot.docs.length - 1]);
+      snapshot.docs.map((doc) => setSnap(snap => [...snap, ({ ...doc.data(), id: doc.id })])); }
+    );
+  }
 
   async function updateDoc(session) {
     const q = query(collection(db, "userDocs/", `${ session.user.email }`, "/docs"), where("required", "!=", null), where("required", "==", false));
@@ -37,9 +48,10 @@ export default function Home() {
       { if (session) {
         updateDoc(session);
 
-        const q = query(collection(db, "userDocs/", `${ session.user.email }`, "/docs"), orderBy("timestamp", "desc"));
-        onSnapshot(q, (snapshot) =>
-          setSnap(snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id })))
+        const q = query(collection(db, "userDocs/", `${ session.user.email }`, "/docs"), orderBy("timestamp", "desc"), limit(3));
+        onSnapshot(q, (snapshot) => { 
+          setLastDoc(snapshot.docs[snapshot.docs.length - 1]);
+          setSnap(snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id }))); }
         );
       }
     }, [ session ]
@@ -154,24 +166,29 @@ export default function Home() {
             <Icon name="folder" size="3xl" color="gray" />
           </div>
 
-          {session ? snap.filter((val) => 
-            {
-              if (searchTerm == ""){
-                return val;
-              }
-              else if (val.fileName.toLowerCase().includes(searchTerm.toLowerCase())) {
-                return val;
-              }
-            }).map((doc) => (
-            <DocumentRow 
-              key={ doc.id } 
-              id={ doc.id }
-              email={ session.user.email } 
-              fileName={ doc.fileName } 
-              date={ doc.timestamp } 
-            />
-            )) : <></>
-          }
+          <InfiniteScroll
+            dataLength={ snap.length }
+            next={ getMoreDocs }
+            hasMore={ true }>
+            {session ? snap.filter((val) => 
+              {
+                if (searchTerm == ""){
+                  return val;
+                }
+                else if (val.fileName.toLowerCase().includes(searchTerm.toLowerCase())) {
+                  return val;
+                }
+              }).map((doc) => (
+              <DocumentRow 
+                key={ doc.id } 
+                id={ doc.id }
+                email={ session.user.email } 
+                fileName={ doc.fileName } 
+                date={ doc.timestamp } 
+              />
+              )) : <></>
+            }
+          </InfiniteScroll>
 
         </div>
       </section>
