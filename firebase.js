@@ -2,13 +2,13 @@ import { getFirestore } from "firebase/firestore";
 import { initializeApp, getApps, getApp } from "firebase/app";
 
 const firebaseConfig = {
-    apiKey: "AIzaSyDebABrC5Ao4yu5wiZRDR_OE9bVlzbpWLU",
-    authDomain: "document-viewer-editor-e88ab.firebaseapp.com",
-    projectId: "document-viewer-editor-e88ab",
-    storageBucket: "document-viewer-editor-e88ab.appspot.com",
-    messagingSenderId: "831948840605",
-    appId: "1:831948840605:web:b6274e5f5229d4d8b03e74"
-  };
+  apiKey: "AIzaSyDjojcir0Ie0Qsdm1qJ4m2FZLoi9aOpzA8",
+  authDomain: "document-viewer-editor-f1379.firebaseapp.com",
+  projectId: "document-viewer-editor-f1379",
+  storageBucket: "document-viewer-editor-f1379.appspot.com",
+  messagingSenderId: "62415916478",
+  appId: "1:62415916478:web:d7bf248136a5a7a1277def"
+};
 
 const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
 const db = getFirestore();
