@@ -102,26 +102,30 @@ export default function Home() {
       </Head>
 
       <header className="sticky top-0 z-50 flex items-center px-4 py-2 shadow-md bg-white">
-        <Button color="gray" buttonType="outline" rounded={true} iconOnly={true} ripple="dark" className="h-20 w-20 border-0"><Icon name="menu" size="3xl" /></Button>
-        <Icon name="description" size="5xl" color="orange" />
-        <h1 className="ml-2 text-gray-700 text-2xl">Archive</h1>
+        <Button color="gray" buttonType="outline" rounded={true} iconOnly={true} ripple="dark" className="hidden md:inline-flex h-20 w-20 border-0"><Icon name="menu" size="3xl" /></Button>
+        
+        <div className="hidden md:inline-flex">
+          <Icon name="description" size="5xl" color="orange" />
+        </div>
+        
+        <h1 className="hidden md:inline-flex ml-2 text-gray-700 text-2xl">Archive</h1>
         
         {session ? (
             <>
-            <div className="mx-5 md:mx-20 flex flex-grow items-center px-5 py-2 bg-gray-100 text-gray-600 rounded-lg focus-within:text-gray-600 focus-within:shadow-md">
+            <div className="md:mx-20 md:px-5 flex flex-grow items-center py-2 bg-gray-100 text-gray-600 rounded-lg focus-within:text-gray-600 focus-within:shadow-md">
                 <Icon name="search" size="3xl" color="gray" />
-                <input type="text" placeholder="Search" className="flex-grow px-5 text-base bg-transparent outline-none" onChange={ (e) => { setSearchTerm(e.target.value); } } />
+                <input type="text" placeholder="Search" className="flex-grow md:px-5 px-1 text-base bg-transparent outline-none" onChange={ (e) => { setSearchTerm(e.target.value); } } />
             </div>
 
-            <Button color="gray" buttonType="outline" rounded={true} iconOnly={true} ripple="dark" className="ml-5 md:ml-20 h-20 w-20 border-0"><Icon name="apps" size="3xl" color="gray" /></Button>
+            <Button color="gray" buttonType="outline" rounded={true} iconOnly={true} ripple="dark" className="hidden md:inline-flex ml-5 md:ml-20 h-20 w-20 border-0"><Icon name="apps" size="3xl" color="gray" /></Button>
             <img loading="lazy" onClick={ signOut } className="cursor-pointer h-12 w-12 rounded-full ml-2" src={session?.user?.image} alt="" />
             </>
 
         ) : (
             <>
-            <div className="mx-5 md:mx-20 flex flex-grow items-center px-5 py-2 bg-gray-100 text-gray-600 rounded-lg focus-within:text-gray-600 focus-within:shadow-md">
+            <div className="md:mx-20 md:px-5 flex flex-grow items-center py-2 bg-gray-100 text-gray-600 rounded-lg focus-within:text-gray-600 focus-within:shadow-md">
                 <Icon name="search" size="3xl" color="gray" />
-                <input type="text" placeholder="Search" className="flex-grow px-5 text-base bg-transparent outline-none" />
+                <input type="text" placeholder="Search" className="flex-grow md:px-5 px-1 text-base bg-transparent outline-none" />
             </div>
 
             <Button onClick={ signIn } buttonType="outline" color="orange" rounded={true} iconOnly={true} ripple="dark" className="ml-5 md:ml-20 h-20 w-20 border-0"> Sign In </Button>
@@ -129,7 +133,7 @@ export default function Home() {
         )}
         
         
-    </header>
+      </header>
 
       { modal }
 

@@ -100,8 +100,11 @@ function DocumentRow({ id, fileName, date, email }){
             { modal }
             { re_modal }
 
-            <Icon onClick={ () => router.push(`/doc/${id}`) } name="article" size="3xl" color="orange" />
-            <p onClick={ () => router.push(`/doc/${id}`) } className="flex-grow pl-5 w-10 pr-10 truncate">{ fileName }</p>
+            <div className="hidden md:inline-flex">
+              <Icon onClick={ () => router.push(`/doc/${id}`) } name="article" size="3xl" color="orange" />
+            </div>
+            
+            <p onClick={ () => router.push(`/doc/${id}`) } className="flex-grow md:pl-5 pl-1 w-10 pr-10 truncate">{ fileName }</p>
             <p onClick={ () => router.push(`/doc/${id}`) } className="pr-5 text-sm">{ date?.toDate().toLocaleDateString() }</p>
 
           <Dropdown>
