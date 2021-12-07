@@ -1,7 +1,7 @@
 import dynamic from "next/dynamic";
 import { convertFromRaw, convertToRaw } from "draft-js";
 import { db } from "../firebase";
-import { doc, onSnapshot, setDoc } from "@firebase/firestore";
+import { doc, onSnapshot, serverTimestamp, setDoc } from "@firebase/firestore";
 import { EditorState } from "draft-js";
 import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
@@ -48,6 +48,7 @@ function TextEditor() {
         const docRef = doc(db, "userDocs/", `${ session.user.email }`, "/docs/", `${ id }`);
         const payload = { 
             editorState: convertToRaw(editorState.getCurrentContent()), 
+            timestamp: serverTimestamp(), 
             required: false 
         };
 
